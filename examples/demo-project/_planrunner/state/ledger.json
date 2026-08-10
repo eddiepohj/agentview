@@ -1,0 +1,25 @@
+{
+  "created": "2026-08-10T09:00:00Z",
+  "steps": [
+    {
+      "id": "DISCOVER",
+      "status": "complete",
+      "owner": "observer",
+      "tier": "worker",
+      "attempts": 1,
+      "deliverable": "notes/discovery.md",
+      "depends_on": [],
+      "updated": "2026-08-10T09:00:00Z"
+    },
+    {
+      "id": "REPORT",
+      "status": "complete",
+      "owner": "implementer",
+      "tier": "worker",
+      "attempts": 1,
+      "deliverable": "reports/summary.md",
+      "depends_on": ["DISCOVER"],
+      "updated": "2026-08-10T09:05:00Z"
+    }
+  ]
+}

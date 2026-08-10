@@ -1,0 +1,35 @@
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.*
+secrets.*
+
+# Python tooling
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Generated output and scratch work
+*.html
+.scratch/
+report.html
+
+# Private local run material and editor settings
+_tieredrunner/
+_maxrunner/
+.claude/settings.local.json
+.DS_Store
+*.swp
+*.swo
+*~
