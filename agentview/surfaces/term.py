@@ -42,16 +42,22 @@ def _restore(fd: int, old: Any) -> None:
 
 @contextmanager
 def raw_mode(stream: TextIO | None = None,
-             _setraw: Callable[[int], Any] = tty.setcbreak) -> Iterator[bool]:
+             _setraw: Callable[[int], Any] = tty.setcbreak,
+             _getattr: Callable[[int], Any] = termios.tcgetattr,
+             ) -> Iterator[bool]:
     """Enter raw mode for `stream` for the lifetime of the `with` body,
     restoring the previous terminal settings in a `finally` on every exit
     path -- a normal return, an exception, or a `KeyboardInterrupt`.
 
-    Yields `False` -- without touching the terminal at all -- when `stream`
-    is not a TTY, or when `_setraw` itself raises `OSError` (no controlling
-    terminal, permission denied). A terminal quirk degrades this read-only
-    diagnostic pane to the non-interactive path; it must never crash the
-    run over it.
+    Capture the previous settings explicitly: `tty.setcbreak` returns `None`
+    on Python 3.10 and 3.11, and returns the previous settings only from
+    Python 3.12 onward.
+
+    Yields `False` -- without changing the terminal -- when `stream` is not a
+    TTY, or when reading or changing its settings raises `OSError` (no
+    controlling terminal, permission denied). A terminal quirk degrades this
+    read-only diagnostic pane to the non-interactive path; it must never crash
+    the run over it.
     """
     stream = sys.stdin if stream is None else stream
     if not stream.isatty():
@@ -60,7 +66,8 @@ def raw_mode(stream: TextIO | None = None,
 
     fd = stream.fileno()
     try:
-        old = _setraw(fd)
+        old = _getattr(fd)
+        _setraw(fd)
     except OSError:
         yield False
         return

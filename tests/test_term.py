@@ -32,9 +32,27 @@ def test_raw_mode_is_restored_after_an_exception(monkeypatch):
     restored = []
     monkeypatch.setattr(term, "_restore", lambda *a: restored.append(a))
     with pytest.raises(RuntimeError):
-        with term.raw_mode(_FakeStdin(tty=True), _setraw=lambda fd: None):
+        with term.raw_mode(_FakeStdin(tty=True),
+                           _setraw=lambda fd: None,
+                           _getattr=lambda fd: ["old-settings"]):
             raise RuntimeError("boom")
-    assert restored, "terminal left in raw mode after an exception"
+    assert restored == [(0, ["old-settings"])], (
+        "terminal left in raw mode after an exception")
+
+
+def test_raw_mode_does_not_depend_on_setcbreak_return_value(monkeypatch):
+    """Python 3.10/3.11 return None from tty.setcbreak; Python 3.12 returns
+    the previous attributes. Restoration must use our explicit snapshot, not
+    either version-specific return value."""
+    restored = []
+    monkeypatch.setattr(term, "_restore", lambda *a: restored.append(a))
+
+    with term.raw_mode(_FakeStdin(tty=True),
+                       _setraw=lambda fd: None,
+                       _getattr=lambda fd: ["snapshot"]) as interactive:
+        assert interactive is True
+
+    assert restored == [(0, ["snapshot"])]
 
 
 def test_read_key_returns_none_when_nothing_is_pending():
