@@ -90,6 +90,20 @@ private-corpus checks, if present in a development checkout, are opt-in:
 python -m pytest --run-corpus
 ```
 
+## In the works
+
+These roadmap items are exploratory and are not part of the current release contract:
+
+- **A shared runner interoperability contract.** Read and validate the same versioned run
+  manifest and normalized event stream emitted by Light Runner, Plan Runner, and Tiered
+  Runner. This would reduce layout-specific discovery, expose reviewer provenance and
+  schema drift explicitly, and make new adversarial-model adapters visible without
+  AgentView-specific parsing changes.
+- **Portable run-health feedback.** Add an explicit `agentview doctor --json` diagnostic
+  export that a user can inspect and attach to a later Tiered Runner director sweep. The
+  handoff would surface missing evidence, attribution gaps, and compatibility drift while
+  preserving AgentView's read-only, non-orchestrating boundary.
+
 ## License
 
 Licensed under the Apache License 2.0. See `LICENSE` and `NOTICE`.
