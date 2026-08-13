@@ -271,7 +271,28 @@ def test_frame_renders_when_the_project_path_does_not_exist(tmp_path):
     run = _run(tmp_path)
     run.ref.project = tmp_path / "this-directory-was-never-created"
     frame = render_frame(run)  # must not raise
-    assert "tiered-runner" in frame
+    assert "plan-runner" in frame
+
+
+@pytest.mark.parametrize("marker,expected", [
+    ("_planrunner", "plan-runner"),
+    ("_lightrunner", "light-runner"),
+    ("_maxrunner", "max-runner"),
+    ("_tieredrunner", "max-runner"),   # legacy marker, same runner
+])
+def test_the_header_names_the_runner_that_wrote_the_run(fake_run, marker,
+                                                        expected):
+    """The header label read as a literal `"tiered-runner"` for every layout,
+    so `watch` on a plan-runner run announced the wrong runner. `watch` and
+    `replay` accept all four layouts, and the pane tests only ever built the
+    tiered fixture, so nothing could catch it. Parametrised over every marker
+    precisely so a literal cannot pass again."""
+    from agentview.layouts import BY_MARKER
+    frame = render_frame(fake_run(layout=BY_MARKER[marker]))
+    header = frame.splitlines()[0]
+    assert header.startswith(expected)
+    wrong = {"plan-runner", "light-runner", "max-runner"} - {expected}
+    assert not any(w in header for w in wrong)
 
 
 def test_render_frame_is_pure_even_if_disk_changes_between_calls(tmp_path):
@@ -361,7 +382,7 @@ def test_replay_output_is_captured_by_redirect_stdout(tmp_path):
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         replay(run)
-    assert "tiered-runner" in buf.getvalue()
+    assert "plan-runner" in buf.getvalue()
 
 
 def test_replay_progresses_through_distinct_stages(tmp_path):
@@ -389,7 +410,7 @@ def test_watch_output_is_captured_by_redirect_stdout(tmp_path):
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         watch(ref, sessions=[], interval=0, iterations=1)
-    assert "tiered-runner" in buf.getvalue()
+    assert "plan-runner" in buf.getvalue()
 
 
 # --- Fix wave, item 5 (C4): the live pane must show movement -----------------

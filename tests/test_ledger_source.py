@@ -111,10 +111,10 @@ def test_unparseable_updated_emits_anomaly_and_is_absent_from_step_windows(tmp_p
 
 
 def _run_from(tmp_path, data):
-    """Write `data` as a current-schema ledger under a real tiered-runner layout
+    """Write `data` as a current-schema ledger under a real max-runner layout
     and build the Run from it, so these tests exercise `find_runs` and
     `build_run` end to end rather than only `read_ledger` in isolation."""
-    sd = tmp_path / "_tieredrunner" / "mr" / "state"
+    sd = tmp_path / "_maxrunner" / "mr" / "state"
     sd.mkdir(parents=True)
     (sd / "ledger.json").write_text(json.dumps(data))
     return build_run(find_runs(tmp_path)[0], sessions=[])

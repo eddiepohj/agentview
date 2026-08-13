@@ -3,7 +3,7 @@ import json
 from agentview.layouts import BY_MARKER
 from agentview.sources.gatepin import reviewer_pin
 
-_TIERED, _PLAN = BY_MARKER["_tieredrunner"], BY_MARKER["_planrunner"]
+_TIERED, _PLAN = BY_MARKER["_maxrunner"], BY_MARKER["_planrunner"]
 
 
 def _pins(tmp_path, data):

@@ -59,8 +59,8 @@ never read implicitly; supply it only when needed with `--pin-file PATH`.
 | Reviewer-round JSON | No | Shows review rounds and escalations. |
 | Reviewer pin JSON passed with `--pin-file` | No | Displays the model recorded for a reviewer thread. |
 
-Supported layouts are `_planrunner`, `_lightrunner`, and `_tieredrunner`.
-Legacy `_maxrunner` runs remain readable. A missing optional artifact produces a
+Supported layouts are `_planrunner`, `_lightrunner`, and `_maxrunner`.
+Legacy `_tieredrunner` runs remain readable. A missing optional artifact produces a
 degraded report rather than an error. Malformed external records are treated as
 diagnostics where possible; MaxView does not modify them.
 

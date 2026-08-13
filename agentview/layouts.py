@@ -5,7 +5,7 @@
 """Runner layouts and their tiers, declared as data.
 
 Every runner-specific fact lives in this table and nowhere else. v1 spread the
-same knowledge across three call sites in `discovery.py`; adding tiered-runner
+same knowledge across three call sites in `discovery.py`; adding max-runner
 meant editing all three, including getting "is the slug the state dir or its
 parent" right by hand. Here that is one field with one fixture behind it.
 """
@@ -43,6 +43,12 @@ class RunnerLayout:
     gpt_nesting: str         # "flat" | "per-step"
     tiers: tuple[TierSpec, ...]
     gate_thread: str | None
+    display: str = ""
+    """The runner's name as shown to a reader. Derived from the runner, not the
+    marker, so a legacy marker still reports the runner that wrote it. Surfaces
+    must read this rather than hardcode a name: `watch` and `replay` accept
+    every layout, so a literal in the header mislabels three runners out of
+    four."""
 
 
 _HUMAN = TierSpec("human", "human")
@@ -62,34 +68,36 @@ LAYOUTS: tuple[RunnerLayout, ...] = (
         marker="_planrunner", depth="child", state_dir_name="",
         slug_from="state-dir", strip_prefix="state-", main_names=("state",),
         build_log="suffixed", gpt_subpath="gates/gpt", gpt_nesting="flat",
-        tiers=_PLAIN_TIERS, gate_thread=None,
+        tiers=_PLAIN_TIERS, gate_thread=None, display="plan-runner",
     ),
     RunnerLayout(
         marker="_lightrunner", depth="marker", state_dir_name="",
         slug_from="fixed-main", strip_prefix=None, main_names=(),
         build_log="suffixed", gpt_subpath="gates/gpt", gpt_nesting="flat",
-        tiers=_PLAIN_TIERS, gate_thread=None,
+        tiers=_PLAIN_TIERS, gate_thread=None, display="light-runner",
     ),
     RunnerLayout(
-        # Gate B passes `--emit-dir _tieredrunner/<slug>/state/md --step <id>` on
+        # Gate B passes `--emit-dir _maxrunner/<slug>/state/md --step <id>` on
         # every round, and gate.py's write_round drops
         # <emit_dir>/<step>/<gate>-r<n>.json -- hence "md", nested per step.
         # v1 recorded None here because no invocation then passed --emit-dir.
-        marker="_tieredrunner", depth="grandchild", state_dir_name="state",
-        slug_from="parent-of-state", strip_prefix=None, main_names=(),
-        build_log="root-only", gpt_subpath="md", gpt_nesting="per-step",
-        tiers=_TIERED_TIERS,
-        gate_thread="cmag-{slug}",
-    ),
-    RunnerLayout(
-        # Read compatibility for runs created before Max Runner was renamed.
-        # MaxView never writes either layout, so retaining this marker cannot
-        # create new legacy state.
         marker="_maxrunner", depth="grandchild", state_dir_name="state",
         slug_from="parent-of-state", strip_prefix=None, main_names=(),
         build_log="root-only", gpt_subpath="md", gpt_nesting="per-step",
         tiers=_TIERED_TIERS,
-        gate_thread="cmag-{slug}",
+        gate_thread="cmag-{slug}", display="max-runner",
+    ),
+    RunnerLayout(
+        # Read compatibility for runs written while the runner was briefly
+        # published as "tiered-runner". Identical to `_maxrunner` in every
+        # field but the marker, and it reports the same `display` because the
+        # same runner wrote it. MaxView never writes either layout, so
+        # retaining this marker cannot create new legacy state.
+        marker="_tieredrunner", depth="grandchild", state_dir_name="state",
+        slug_from="parent-of-state", strip_prefix=None, main_names=(),
+        build_log="root-only", gpt_subpath="md", gpt_nesting="per-step",
+        tiers=_TIERED_TIERS,
+        gate_thread="cmag-{slug}", display="max-runner",
     ),
 )
 

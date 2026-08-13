@@ -34,7 +34,7 @@ def test_watch_honours_iteration_bound(tmp_path, capsys):
     root = _project(tmp_path)
     assert main(["watch", str(root), "--iterations", "1", "--interval", "0",
                  *NO_SESSIONS]) == 0
-    assert "tiered-runner" in capsys.readouterr().out
+    assert "plan-runner" in capsys.readouterr().out
 
 
 def test_unknown_subcommand_is_rejected(tmp_path):
@@ -163,4 +163,4 @@ def test_replay_writes_to_the_current_stdout(tmp_path, capsys):
     is what a frame written to a stale reference misses."""
     root = _project(tmp_path)
     assert main(["replay", str(root), *NO_SESSIONS]) == 0
-    assert "tiered-runner" in capsys.readouterr().out
+    assert "plan-runner" in capsys.readouterr().out

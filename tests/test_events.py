@@ -17,7 +17,7 @@ def test_parse_iso_returns_none_for_junk():
     assert parse_iso("not a date") is None
 
 
-def test_known_kinds_include_the_tiered_runner_events():
+def test_known_kinds_include_the_max_runner_events():
     for k in ("step.dispatch", "agent.spawn", "gate.open",
               "md.review", "fable.rule", "doc.write"):
         assert k in KINDS

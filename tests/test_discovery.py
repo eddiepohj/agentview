@@ -490,24 +490,24 @@ def test_a_session_driving_another_projects_run_is_not_swept_in_by_the_relative_
     assert found[voice.state_dir] == []
 
 
-# --- tiered-runner discovery ----------------------------------------------------
+# --- max-runner discovery ----------------------------------------------------
 #
-# tiered-runner's layout inverts plan-runner's: `<project>/_tieredrunner/<slug>/state/
+# max-runner's layout inverts plan-runner's: `<project>/_maxrunner/<slug>/state/
 # ledger.json`. The slug is the *parent* of the state directory, and the state
 # directory is always literally named "state" -- the reverse of plan-runner,
 # where the state directory itself carries the slug (via `state-<suffix>`
-# stripping, or the directory's own name). A naive addition of "_tieredrunner" to
+# stripping, or the directory's own name). A naive addition of "_maxrunner" to
 # the marker-name tuple, still deriving slug from the state dir's own name,
-# would read "state" every time and report every tiered-runner run as "main".
+# would read "state" every time and report every max-runner run as "main".
 # Every test below uses at least two differently-named slug directories so a
 # single-slug fixture (which "main" x1 could accidentally satisfy) can't hide
 # that bug.
 
 
-def _tieredrunner_project(tmp_path, slugs, build_logs=()):
+def _maxrunner_project(tmp_path, slugs, build_logs=()):
     proj = tmp_path / "proj"
     for slug in slugs:
-        d = proj / "_tieredrunner" / slug / "state"
+        d = proj / "_maxrunner" / slug / "state"
         d.mkdir(parents=True)
         (d / "ledger.json").write_text(json.dumps({"steps": []}))
     for lg in build_logs:
@@ -515,36 +515,36 @@ def _tieredrunner_project(tmp_path, slugs, build_logs=()):
     return proj
 
 
-def test_tieredrunner_slug_is_the_parent_directory_not_the_state_dir_name(tmp_path):
+def test_maxrunner_slug_is_the_parent_directory_not_the_state_dir_name(tmp_path):
     """Two slugs, both with a state dir literally named "state". If slug were
     derived the plan-runner way (from the state dir's own name, "state" ->
     "main"), both would collapse to "main" -- one slug instead of two, and the
     wrong one. Only reading the parent directory's name survives this."""
-    proj = _tieredrunner_project(tmp_path, ["alpha", "beta"])
+    proj = _maxrunner_project(tmp_path, ["alpha", "beta"])
     runs = find_runs(tmp_path)
     assert {r.slug for r in runs} == {"alpha", "beta"}
     assert all(r.state_dir.name == "state" for r in runs)
     assert all(r.project == proj for r in runs)
 
 
-def test_tieredrunner_state_dir_is_slug_dir_over_state_not_slug_dir_itself(tmp_path):
-    """Pins the exact path shape: `_tieredrunner/<slug>/state`, not
-    `_tieredrunner/<slug>` itself (which is what a lightrunner-style "the marker
+def test_maxrunner_state_dir_is_slug_dir_over_state_not_slug_dir_itself(tmp_path):
+    """Pins the exact path shape: `_maxrunner/<slug>/state`, not
+    `_maxrunner/<slug>` itself (which is what a lightrunner-style "the marker
     child is the run" reading would produce)."""
-    proj = _tieredrunner_project(tmp_path, ["alpha", "beta"])
+    proj = _maxrunner_project(tmp_path, ["alpha", "beta"])
     by_slug = {r.slug: r for r in find_runs(tmp_path)}
-    assert by_slug["alpha"].state_dir == proj / "_tieredrunner" / "alpha" / "state"
-    assert by_slug["beta"].state_dir == proj / "_tieredrunner" / "beta" / "state"
+    assert by_slug["alpha"].state_dir == proj / "_maxrunner" / "alpha" / "state"
+    assert by_slug["beta"].state_dir == proj / "_maxrunner" / "beta" / "state"
     assert by_slug["alpha"].ledger == \
-        proj / "_tieredrunner" / "alpha" / "state" / "ledger.json"
+        proj / "_maxrunner" / "alpha" / "state" / "ledger.json"
 
 
-def test_tieredrunner_scaffolded_but_empty_run_is_ignored_without_crashing(tmp_path):
+def test_maxrunner_scaffolded_but_empty_run_is_ignored_without_crashing(tmp_path):
     """The exact shape of the live demo-run run when checked: four empty
     directories under state/ and no ledger.json anywhere. Must not crash and
     must not be reported as a run."""
     proj = tmp_path / "proj"
-    slug_dir = proj / "_tieredrunner" / "demo-run"
+    slug_dir = proj / "_maxrunner" / "demo-run"
     for sub in ("briefs", "recon", "reports"):
         (slug_dir / sub).mkdir(parents=True)
     for sub in ("gates", "records", "changes", "tracks", "sweeps", "md"):
@@ -552,11 +552,11 @@ def test_tieredrunner_scaffolded_but_empty_run_is_ignored_without_crashing(tmp_p
     assert find_runs(tmp_path) == []
 
 
-def test_tieredrunner_run_is_picked_up_as_soon_as_its_ledger_appears(tmp_path):
+def test_maxrunner_run_is_picked_up_as_soon_as_its_ledger_appears(tmp_path):
     """Same scaffold as above, but this time a ledger.json lands in state/ --
     the run must now be discovered, proving pickup needs no other signal."""
     proj = tmp_path / "proj"
-    slug_dir = proj / "_tieredrunner" / "demo-run"
+    slug_dir = proj / "_maxrunner" / "demo-run"
     for sub in ("gates", "records"):
         (slug_dir / "state" / sub).mkdir(parents=True)
     (slug_dir / "state" / "ledger.json").write_text(json.dumps({"steps": []}))
@@ -564,37 +564,37 @@ def test_tieredrunner_run_is_picked_up_as_soon_as_its_ledger_appears(tmp_path):
     assert [r.slug for r in runs] == ["demo-run"]
 
 
-def test_tieredrunner_build_log_is_the_unsuffixed_project_root_log(tmp_path):
-    """tiered-runner never pairs a suffixed BUILD-LOG-<slug>.md the way
-    plan-runner does -- every run under one project's `_tieredrunner/` shares the
+def test_maxrunner_build_log_is_the_unsuffixed_project_root_log(tmp_path):
+    """max-runner never pairs a suffixed BUILD-LOG-<slug>.md the way
+    plan-runner does -- every run under one project's `_maxrunner/` shares the
     single unsuffixed BUILD-LOG.md at the project root. Both slugs here must
     resolve to the *same* file object, and a suffixed file that happens to
     exist (mimicking someone assuming the plan-runner convention carries over)
     must be ignored rather than preferred."""
-    proj = _tieredrunner_project(tmp_path, ["alpha", "beta"],
+    proj = _maxrunner_project(tmp_path, ["alpha", "beta"],
                               build_logs=["BUILD-LOG.md", "BUILD-LOG-alpha.md"])
     by_slug = {r.slug: r for r in find_runs(tmp_path)}
     assert by_slug["alpha"].build_log == proj / "BUILD-LOG.md"
     assert by_slug["beta"].build_log == proj / "BUILD-LOG.md"
 
 
-def test_tieredrunner_missing_build_log_is_none(tmp_path):
-    proj = _tieredrunner_project(tmp_path, ["alpha"])
+def test_maxrunner_missing_build_log_is_none(tmp_path):
+    proj = _maxrunner_project(tmp_path, ["alpha"])
     assert find_runs(tmp_path)[0].build_log is None
 
 
-def test_tieredrunner_gpt_dir_is_none_even_when_gates_gpt_and_md_both_exist(
+def test_maxrunner_gpt_dir_is_none_even_when_gates_gpt_and_md_both_exist(
         tmp_path):
     """The MD tier's gate-round JSON lands under `state/md/`: the skill passes
-    `--emit-dir _tieredrunner/<slug>/state/md --step <id>` on every Gate 0/A/B
+    `--emit-dir _maxrunner/<slug>/state/md --step <id>` on every Gate 0/A/B
     round, and gate.py's `write_round` drops `<emit_dir>/<step>/<gate>-r<n>.json`
     there. `state/gates/gpt/` -- plan-runner's own shape -- is a false cognate
-    for tiered-runner and must never be read, even when populated (accidental
+    for max-runner and must never be read, even when populated (accidental
     reuse). Populate *both* `state/gates/gpt/` and `state/md/` with a
     plausible round file and confirm only `state/md/` is wired: `gpt_dir`
     must resolve there, not to `None` and not to `gates/gpt`."""
-    proj = _tieredrunner_project(tmp_path, ["alpha"])
-    sd = proj / "_tieredrunner" / "alpha" / "state"
+    proj = _maxrunner_project(tmp_path, ["alpha"])
+    sd = proj / "_maxrunner" / "alpha" / "state"
     (sd / "gates" / "gpt").mkdir(parents=True)
     (sd / "gates" / "gpt" / "0-r1.json").write_text(json.dumps(
         {"report": {"risks": []}, "classification": {"blocking": []},
@@ -608,7 +608,7 @@ def test_tieredrunner_gpt_dir_is_none_even_when_gates_gpt_and_md_both_exist(
     assert gpt_dir.name == "md"
 
 
-def test_tieredrunner_and_planrunner_runs_coexist_without_merging(tmp_path):
+def test_maxrunner_and_planrunner_runs_coexist_without_merging(tmp_path):
     """A project running both skills side by side (plausible during a
     migration) must yield two distinct runs, each with its own correctly
     shaped state dir -- neither marker's handling may leak into the other's."""
@@ -616,7 +616,7 @@ def test_tieredrunner_and_planrunner_runs_coexist_without_merging(tmp_path):
     pr = proj / "_planrunner" / "state"
     pr.mkdir(parents=True)
     (pr / "ledger.json").write_text(json.dumps({"steps": []}))
-    mr = proj / "_tieredrunner" / "mr-x" / "state"
+    mr = proj / "_maxrunner" / "mr-x" / "state"
     mr.mkdir(parents=True)
     (mr / "ledger.json").write_text(json.dumps({"steps": []}))
 
@@ -627,16 +627,16 @@ def test_tieredrunner_and_planrunner_runs_coexist_without_merging(tmp_path):
     assert by_slug["mr-x"].state_dir == mr
 
 
-def test_tieredrunner_out_inside_the_project_is_refused(tmp_path):
-    """The read-only --out guard (surfaces/report.py) must refuse a tiered-runner
+def test_maxrunner_out_inside_the_project_is_refused(tmp_path):
+    """The read-only --out guard (surfaces/report.py) must refuse a max-runner
     project's own tree exactly as it refuses plan-runner's -- it keys off
     `RunRef.project`, computed generically, so this pins that the new
     discovery path still yields the right project root for the guard to
     check."""
     from agentview.cli import main as cli_main
 
-    proj = _tieredrunner_project(tmp_path, ["demo-run"])
-    out = proj / "_tieredrunner" / "demo-run" / "state" / "agentview-report.html"
+    proj = _maxrunner_project(tmp_path, ["demo-run"])
+    out = proj / "_maxrunner" / "demo-run" / "state" / "agentview-report.html"
     no_sessions = ["--projects-root", "/nonexistent-projects-root-for-tests"]
 
     rc = cli_main(["report", str(proj), "--out", str(out), *no_sessions])

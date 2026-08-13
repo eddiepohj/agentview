@@ -82,11 +82,11 @@ def _agent(agent_id, model, out=100, role="worker", role_source="observed"):
 def fake_run():
     """A Run stand-in for pane tests. render_frame reads only these fields."""
     def _make(**over):
-        layout = over.pop("layout", BY_MARKER["_tieredrunner"])
+        layout = over.pop("layout", BY_MARKER["_maxrunner"])
         ref = SimpleNamespace(
             project=Path("/proj"), slug="demo-run", layout=layout,
-            state_dir=Path("/proj/_tieredrunner/demo-run/state"),
-            ledger=Path("/proj/_tieredrunner/demo-run/state/ledger.json"),
+            state_dir=Path("/proj/_maxrunner/demo-run/state"),
+            ledger=Path("/proj/_maxrunner/demo-run/state/ledger.json"),
             build_log=None, gpt_dir=over.pop("gpt_dir", None))
         base = dict(ref=ref, steps=[], agents=[], events=[], docs=[],
                     sessions=[], anomalies=[], orchestrator_output_tokens=0,
@@ -119,7 +119,7 @@ def unbounded_run(fake_run):
 
 @pytest.fixture
 def run_with_long_doc_path(fake_run):
-    p = ("/Users/example/projects/sample-project/_tieredrunner/demo-run/"
+    p = ("/Users/example/projects/sample-project/_maxrunner/demo-run/"
          "reports/deliverables/E4-outbound.md")
     assert len(p) > 90
     return fake_run(doc_paths=[p])
@@ -214,7 +214,7 @@ def planrunner_run(fake_run):
 
 @pytest.fixture
 def undisplayed_role_run(fake_run):
-    """The `_tieredrunner` layout has no dedicated row for `skeptic` --
+    """The `_maxrunner` layout has no dedicated row for `skeptic` --
     `_role_states`'s worker count already folds such an agent in via `role
     not in displayed`; `_model_cell`'s `else` branch must apply the same
     fold so the skeptic's model is not invisible in the row whose count

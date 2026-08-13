@@ -977,11 +977,11 @@ def test_a_round_present_on_disk_and_in_the_transcript_merges_to_one_event(
         tmp_path):
     """Gate A's conceded R1 fix: the plan's own new tests exercise
     `gpt_events`/`gate_call_events` in isolation only -- none go through
-    `build_run`'s merge/split wiring. This one does, on a `_tieredrunner`-style
+    `build_run`'s merge/split wiring. This one does, on a `_maxrunner`-style
     per-step layout, covering the escalating-round, backfilled-duration,
     surviving-companion-event and surviving-anomaly cases together."""
     proj = tmp_path / "proj"
-    sd = proj / "_tieredrunner" / "myslug" / "state"
+    sd = proj / "_maxrunner" / "myslug" / "state"
     sd.mkdir(parents=True)
     ledger = sd / "ledger.json"
     # `created` bounds the run's span from below (08:00), so the transcript
@@ -1007,7 +1007,7 @@ def test_a_round_present_on_disk_and_in_the_transcript_merges_to_one_event(
     (step_dir / "0-r2.json").write_text("{not valid json")
 
     ref = RunRef(project=proj, state_dir=sd, ledger=ledger, build_log=None,
-                gpt_dir=gpt_dir, slug="myslug", layout=BY_MARKER["_tieredrunner"])
+                gpt_dir=gpt_dir, slug="myslug", layout=BY_MARKER["_maxrunner"])
 
     # The MD's `gate.py review` call for the same (step, gate, round) as the
     # escalating disk round, correlated by tool_use_id, with a real
@@ -1078,7 +1078,7 @@ def test_a_gate_call_outside_the_runs_span_is_excluded_from_run_events(
     shared between two runs leaks one run's gate calls into its sibling's MD
     counts/timing."""
     proj = tmp_path / "proj"
-    sd = proj / "_tieredrunner" / "myslug" / "state"
+    sd = proj / "_maxrunner" / "myslug" / "state"
     sd.mkdir(parents=True)
     ledger = sd / "ledger.json"
     ledger.write_text(json.dumps({
@@ -1086,7 +1086,7 @@ def test_a_gate_call_outside_the_runs_span_is_excluded_from_run_events(
         "steps": [{"id": "S1", "status": "complete",
                    "updated": "2026-07-27T11:00:00Z"}]}))
     ref = RunRef(project=proj, state_dir=sd, ledger=ledger, build_log=None,
-                gpt_dir=None, slug="myslug", layout=BY_MARKER["_tieredrunner"])
+                gpt_dir=None, slug="myslug", layout=BY_MARKER["_maxrunner"])
 
     # This call's send timestamp (08:10) sits well before the run's span
     # (10:00-11:00) -- e.g. a sibling run's own gate call, in a transcript

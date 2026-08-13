@@ -211,7 +211,7 @@ def _role_states(run: Any, s: dict[str, Any]) -> dict[str, str]:
 
     # A role resolves to one of the skill's eight categories even when the
     # layout displays no dedicated row for it (e.g. `skeptic`, `verifier` on
-    # tiered-runner, which declares rows only for human/fable/md/director/
+    # max-runner, which declares rows only for human/fable/md/director/
     # step-runner/worker) -- such agents still count as workers for display,
     # while `AgentRun.role` keeps recording the real category.
     displayed = {t.role for t in run.ref.layout.tiers}
@@ -322,7 +322,8 @@ def render_frame(run: Any, view: Any = None, now_turn: int | None = None,
     done = sum(1 for st in run.steps if st.status in _DONE)
     rule = "─" * width
     lines = [
-        _clip(f"tiered-runner  {run.ref.project.name}  run: {run.ref.slug}"
+        _clip(f"{run.ref.layout.display}  {run.ref.project.name}"
+              f"  run: {run.ref.slug}"
               f"    step {done}/{len(run.steps)}", width),
         rule]
 

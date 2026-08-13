@@ -108,7 +108,7 @@ def self_report_drift(run: Any, rel: float = 0.10,
     """The ledger's self-reported spend beside agentview's derived spend.
 
     This project began because plan-runner, asked to self-report its own
-    observability, recorded `attempts` for 1 step in 25. tiered-runner has since
+    observability, recorded `attempts` for 1 step in 25. max-runner has since
     made those fields mandatory at every close -- which does not make them
     true, it makes them checkable. Nothing else in the toolchain can check
     them: the ledger cannot audit itself, and a session cannot report on

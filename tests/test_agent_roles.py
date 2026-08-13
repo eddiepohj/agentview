@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from agentview.layouts import BY_MARKER
 from agentview.model import assign_agent_roles
 
-_TIERED = BY_MARKER["_tieredrunner"]
+_TIERED = BY_MARKER["_maxrunner"]
 _PLAN = BY_MARKER["_planrunner"]
 
 
