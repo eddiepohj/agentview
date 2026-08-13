@@ -95,12 +95,12 @@ python -m pytest --run-corpus
 These roadmap items are exploratory and are not part of the current release contract:
 
 - **A shared runner interoperability contract.** Read and validate the same versioned run
-  manifest and normalized event stream emitted by Light Runner, Plan Runner, and Tiered
+  manifest and normalized event stream emitted by Light Runner, Plan Runner, and Max
   Runner. This would reduce layout-specific discovery, expose reviewer provenance and
   schema drift explicitly, and make new adversarial-model adapters visible without
   MaxView-specific parsing changes.
 - **Portable run-health feedback.** Add an explicit `agentview doctor --json` diagnostic
-  export that a user can inspect and attach to a later Tiered Runner director sweep. The
+  export that a user can inspect and attach to a later Max Runner director sweep. The
   handoff would surface missing evidence, attribution gaps, and compatibility drift while
   preserving MaxView's read-only, non-orchestrating boundary.
 
