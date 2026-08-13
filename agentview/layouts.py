@@ -1,3 +1,7 @@
+# Copyright 2026 Edvard Pohjavirta
+# Licensed under the Apache License, Version 2.0.
+# See the LICENSE file in the project root for the full text.
+
 """Runner layouts and their tiers, declared as data.
 
 Every runner-specific fact lives in this table and nowhere else. v1 spread the
@@ -79,7 +83,7 @@ LAYOUTS: tuple[RunnerLayout, ...] = (
     ),
     RunnerLayout(
         # Read compatibility for runs created before Max Runner was renamed.
-        # AgentView never writes either layout, so retaining this marker cannot
+        # MaxView never writes either layout, so retaining this marker cannot
         # create new legacy state.
         marker="_maxrunner", depth="grandchild", state_dir_name="state",
         slug_from="parent-of-state", strip_prefix=None, main_names=(),

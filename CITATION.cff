@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "MaxView"
+abstract: "Read-only observability for agentic run artifacts."
+type: software
+authors:
+  - family-names: Pohjavirta
+    given-names: Edvard
+    email: "285586111+eddiepohj@users.noreply.github.com"
+    alias: eddiepohj
+version: 0.1.0
+date-released: 2026-08-10
+license: Apache-2.0
+repository-code: "https://github.com/eddiepohj/agentview"

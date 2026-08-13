@@ -1,3 +1,3 @@
 # Synthetic discovery note
 
-This file exists only to demonstrate AgentView's document detection.
+This file exists only to demonstrate MaxView's document detection.

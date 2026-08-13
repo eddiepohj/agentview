@@ -1,6 +1,6 @@
-# AgentView
+# MaxView
 
-AgentView is a read-only command-line viewer for agentic runs. It reconstructs
+MaxView is a read-only command-line viewer for agentic runs. It reconstructs
 what happened from artifacts a runner already writes: a ledger, optional
 session transcripts, build logs, and optional reviewer-round files. It does
 not run agents, modify a discovered run, call a network service, or require a
@@ -8,7 +8,7 @@ server.
 
 ## Install
 
-AgentView supports Python 3.10 or newer on macOS and Linux.
+MaxView supports Python 3.10 or newer on macOS and Linux.
 
 ```bash
 git clone https://github.com/eddiepohj/agentview.git
@@ -44,12 +44,12 @@ agentview watch /path/to/project --slug main
 agentview replay /path/to/project --slug main
 ```
 
-By default AgentView looks for Claude Code transcript files under
+By default MaxView looks for Claude Code transcript files under
 `~/.claude/projects`. Override that location with `--projects-root`, or point
 it at an empty directory for ledger-only reports. A reviewer model pin is
 never read implicitly; supply it only when needed with `--pin-file PATH`.
 
-## What AgentView reads
+## What MaxView reads
 
 | Artifact | Required | Use |
 |---|---:|---|
@@ -62,11 +62,11 @@ never read implicitly; supply it only when needed with `--pin-file PATH`.
 Supported layouts are `_planrunner`, `_lightrunner`, and `_tieredrunner`.
 Legacy `_maxrunner` runs remain readable. A missing optional artifact produces a
 degraded report rather than an error. Malformed external records are treated as
-diagnostics where possible; AgentView does not modify them.
+diagnostics where possible; MaxView does not modify them.
 
 ## Privacy and safety
 
-- AgentView performs no network requests.
+- MaxView performs no network requests.
 - It writes only the explicit `report --out` file, and refuses an output path
   inside a discovered run project.
 - Reports can contain artifact text and paths. Review them before sharing and
@@ -98,12 +98,13 @@ These roadmap items are exploratory and are not part of the current release cont
   manifest and normalized event stream emitted by Light Runner, Plan Runner, and Tiered
   Runner. This would reduce layout-specific discovery, expose reviewer provenance and
   schema drift explicitly, and make new adversarial-model adapters visible without
-  AgentView-specific parsing changes.
+  MaxView-specific parsing changes.
 - **Portable run-health feedback.** Add an explicit `agentview doctor --json` diagnostic
   export that a user can inspect and attach to a later Tiered Runner director sweep. The
   handoff would surface missing evidence, attribution gaps, and compatibility drift while
-  preserving AgentView's read-only, non-orchestrating boundary.
+  preserving MaxView's read-only, non-orchestrating boundary.
 
-## License
+## Author and license
 
-Licensed under the Apache License 2.0. See `LICENSE` and `NOTICE`.
+Built by Edvard Pohjavirta. Licensed under the Apache License 2.0. See `LICENSE`
+and `NOTICE`.

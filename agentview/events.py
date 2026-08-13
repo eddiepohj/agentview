@@ -1,3 +1,7 @@
+# Copyright 2026 Edvard Pohjavirta
+# Licensed under the Apache License, Version 2.0.
+# See the LICENSE file in the project root for the full text.
+
 """Normalized event stream shared by every agentview source and surface."""
 from __future__ import annotations
 
