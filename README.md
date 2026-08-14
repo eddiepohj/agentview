@@ -6,6 +6,9 @@ session transcripts, build logs, and optional reviewer-round files. It does
 not run agents, modify a discovered run, call a network service, or require a
 server.
 
+Python 3.10+, standard library only at runtime. 367 tests passing from a clean
+virtual environment.
+
 ## Install
 
 MaxView supports Python 3.10 or newer on macOS and Linux.
